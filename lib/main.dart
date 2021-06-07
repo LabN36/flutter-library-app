@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:connectivity/connectivity.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +15,6 @@ import 'package:flutter_library_app/bloc/user.dart';
 import 'package:flutter_library_app/model/book.dart';
 import 'package:flutter_library_app/model/genre.dart';
 import 'package:flutter_library_app/model/userconfig.dart';
-import 'package:flutter_library_app/bypass.dart';
 
 import 'package:flutter_library_app/libraryui/book-add-widget.dart';
 import 'package:flutter_library_app/libraryui/book-detail-widget.dart';
@@ -61,18 +59,21 @@ class RootWidget extends StatelessWidget {
             List<Genre> genreList = snapshot.data['genreList'];
             Map<String, List<Book>> bookListMap = snapshot.data['bookListMap'];
             var connectionBloc = ConnectionBloc(Connectivity());
+            LibraryBloc _libraryBloc = LibraryBloc(LibraryState(
+                genreList: genreList,
+                userState: userState,
+                bookMap: bookListMap));
             print('[RootWidget]:  ${userState.authState}');
             return MultiBlocProvider(
                 providers: [
                   BlocProvider<LibraryBloc>(
-                    create: (context) => LibraryBloc(LibraryState(
-                        genreList: genreList,
-                        userState: userState,
-                        bookMap: bookListMap)),
+                    create: (context) => _libraryBloc,
                   ),
                   BlocProvider<UserBloc>(
-                    create: (BuildContext context) =>
-                        UserBloc(userState: userState, configBloc: _configBloc),
+                    create: (BuildContext context) => UserBloc(
+                        userState: userState,
+                        configBloc: _configBloc,
+                        libraryBloc: _libraryBloc),
                   ),
                   BlocProvider<ConfigBloc>(
                       create: (BuildContext tabBuildContext) {

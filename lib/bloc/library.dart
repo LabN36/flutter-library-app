@@ -10,7 +10,10 @@ abstract class AppEvent {}
 
 abstract class AppState {}
 
-class RefreshLibraryEvent extends AppEvent {}
+class RefreshLibraryEvent extends AppEvent {
+  String uid;
+  RefreshLibraryEvent({this.uid});
+}
 
 class BookEvent extends AppEvent {}
 
@@ -91,7 +94,7 @@ class LibraryBloc extends Bloc<AppEvent, LibraryState> {
     if (event is RefreshLibraryEvent) {
       print('[RefreshLibraryEvent]');
       LibraryDB library = LibraryDB(state.userState.userConfig.db);
-      var res = await library.listGenre();
+      var res = await library.listGenre(uid: event.uid);
       List<Genre> genreList = res['genreList'];
       yield LibraryState(
           genreList: genreList,

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_library_app/bloc/config.dart';
+import 'package:flutter_library_app/bloc/library.dart';
 import 'package:flutter_library_app/model/userconfig.dart';
 import 'package:flutter_library_app/util.dart';
 
@@ -71,9 +72,11 @@ class UserBloc extends Bloc<UserAuthEvent, UserState> {
   UserState userState;
   ConfigBloc configBloc;
   // UserBloc UserBloc;
-  UserBloc({userState, configBloc}) : super(userState) {
+  LibraryBloc libraryBloc;
+  UserBloc({userState, configBloc, libraryBloc}) : super(userState) {
     this.userState = userState;
     this.configBloc = configBloc;
+    this.libraryBloc = libraryBloc;
   }
 
   @override
@@ -101,6 +104,7 @@ class UserBloc extends Bloc<UserAuthEvent, UserState> {
           userid: event.user.userid,
           authState: AuthState.authenticated,
           otp: state.otp);
+      this.libraryBloc.add(RefreshLibraryEvent(uid: event.user.userid));
     } else if (event is UnAuth) {
       print('[Logging Out]');
       this.configBloc.state.userConfig.prefs.remove('userJWT');
